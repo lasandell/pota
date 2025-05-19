@@ -1,0 +1,102 @@
+[
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1904",
+    "CALL": "WD5EEI",
+    "STATE": "TX",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "EM13EC",
+    "QTH": "PARADISE"
+  },
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1908",
+    "CALL": "AB0BM",
+    "STATE": "IA",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "EN22FR",
+    "QTH": "CHEROKEE"
+  },
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1929",
+    "CALL": "NS1C",
+    "STATE": "FL",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "EL87SB",
+    "QTH": "VENICE"
+  },
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1931",
+    "CALL": "WB2MQQ",
+    "STATE": "NY",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "FN24NF",
+    "QTH": "CRANBERRY LAKE"
+  },
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1938",
+    "CALL": "W2GR",
+    "STATE": "NY",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "FN03MC",
+    "QTH": "NIAGARA FALLS"
+  },
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1941",
+    "CALL": "KE2BVB",
+    "STATE": "NJ",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "FN20UF",
+    "QTH": "FREEHOLD"
+  },
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1942",
+    "CALL": "N4XAT",
+    "STATE": "NJ",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "FM29PV",
+    "QTH": "VINCENTOWN"
+  },
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1943",
+    "CALL": "VA3IMW",
+    "STATE": "ON",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "FN03AF",
+    "QTH": "HAMILTON"
+  },
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1948",
+    "CALL": "KZ9V",
+    "STATE": "WI",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "EN44IT",
+    "QTH": "EAU CLAIRE"
+  },
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1959",
+    "CALL": "NE3I",
+    "STATE": "PA",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "FN20GF",
+    "QTH": "COLLEGEVILLE"
+  }
+]
