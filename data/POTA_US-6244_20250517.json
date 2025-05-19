@@ -1,0 +1,101 @@
+[
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1515",
+    "CALL": "NE3I",
+    "STATE": "PA",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "FN20GF",
+    "QTH": "COLLEGEVILLE"
+  },
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1519",
+    "CALL": "N4SSD",
+    "STATE": "TN",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "EM65TV",
+    "QTH": "MURFREESBORO"
+  },
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1524",
+    "CALL": "K1RDD",
+    "STATE": "MA",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "FN42DH",
+    "QTH": "SHREWSBURY"
+  },
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1524",
+    "CALL": "NN0TE",
+    "STATE": "MN",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "EN47IH",
+    "QTH": "SILVER BAY"
+  },
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1527",
+    "CALL": "K9IS",
+    "STATE": "WI",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "EN55QD",
+    "QTH": "WHITE LAKE"
+  },
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1532",
+    "CALL": "KA5TXN",
+    "STATE": "TX",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "EM13RJ",
+    "QTH": "ANNA"
+  },
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1535",
+    "CALL": "WD5EEI",
+    "STATE": "TX",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "EM13EC",
+    "QTH": "PARADISE"
+  },
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1536",
+    "CALL": "W2ELS",
+    "STATE": "NY",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "FN13BC",
+    "QTH": "CHURCHVILLE"
+  },
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1550",
+    "CALL": "K1PUG",
+    "STATE": "CT",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "FN31LT"
+  },
+  {
+    "QSO_DATE": "20250517",
+    "TIME_ON": "1551",
+    "CALL": "N4XAT",
+    "STATE": "NJ",
+    "BAND": "20M",
+    "MODE": "CW",
+    "GRIDSQUARE": "FM29PV",
+    "QTH": "VINCENTOWN"
+  }
+]
