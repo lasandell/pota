@@ -1,14 +1,4 @@
-[
-  {
-    "DATE": "20250517",
-    "TIME": "1904",
-    "TYPE": "POTA",
-    "REF": "US-2963",
-    "NAME": "Old Stone Fort",
-    "GRIDSQUARE": "EM65WL",
-    "LAT": "35.4912",
-    "LON": "-86.1032"
-  }
+
   {
     "DATE": "20250517",
     "TIME": "1515",
@@ -18,5 +8,15 @@
     "GRIDSQUARE": "EM65UU",
     "LAT": "35.8585",
     "LON": "-86.2954"
+  },
+  {
+    "DATE": "20250517",
+    "TIME": "1904",
+    "TYPE": "POTA",
+    "REF": "US-2963",
+    "NAME": "Old Stone Fort",
+    "GRIDSQUARE": "EM65WL",
+    "LAT": "35.4912",
+    "LON": "-86.1032"
   }
 ]
