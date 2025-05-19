@@ -1,16 +1,6 @@
 [
   {
     "DATE": "20250517",
-    "TIME": "1515",
-    "TYPE": "POTA",
-    "REF": "US-6244",
-    "NAME": "Flat Rock Cedar Glade",
-    "GRIDSQUARE": "EM65UU",
-    "LAT": "35.8585",
-    "LON": "-86.2954"
-  },
-  {
-    "DATE": "20250517",
     "TIME": "1904",
     "TYPE": "POTA",
     "REF": "US-2963",
@@ -18,5 +8,15 @@
     "GRIDSQUARE": "EM65WL",
     "LAT": "35.4912",
     "LON": "-86.1032"
+  }.
+  {
+    "DATE": "20250517",
+    "TIME": "1515",
+    "TYPE": "POTA",
+    "REF": "US-6244",
+    "NAME": "Flat Rock Cedar Glade",
+    "GRIDSQUARE": "EM65UU",
+    "LAT": "35.8585",
+    "LON": "-86.2954"
   }
 ]
