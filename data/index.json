@@ -1,22 +1,28 @@
 [
   {
-    "DATE": "20250517",
-    "TIME": "1515",
-    "TYPE": "POTA",
-    "REF": "US-6244",
-    "NAME": "Flat Rock Cedar Glade",
-    "GRIDSQUARE": "EM65UU",
-    "LAT": "35.8585",
-    "LON": "-86.2954"
+    "date": "20250517",
+    "time": "1515",
+    "sig": "POTA",
+    "ref": "US-6244",
+    "name": "Flat Rock Cedar Glade",
+    "type": "State Natural Area",
+    "grid": "EM65UU",
+    "lat": "35.8585",
+    "lon": "-86.2954",
+    "qsos": 10,
+    "web": "https://www.tn.gov/environment/program-areas/na-natural-areas/natural-areas-middle-region/middle-region/flat-rock-cedar-glades-and-barrens.html"
   },
   {
-    "DATE": "20250517",
-    "TIME": "1904",
-    "TYPE": "POTA",
-    "REF": "US-2963",
-    "NAME": "Old Stone Fort",
-    "GRIDSQUARE": "EM65WL",
-    "LAT": "35.4912",
-    "LON": "-86.1032"
+    "date": "20250517",
+    "time": "1904",
+    "sig": "POTA",
+    "ref": "US-2963",
+    "name": "Old Stone Fort",
+    "type": "State Park",
+    "grid": "EM65WL",
+    "lat": "35.4912",
+    "lon": "-86.1032",
+    "qsos": 10,
+    "web": "https://tnstateparks.com/parks/old-stone-fort"
   }
 ]
