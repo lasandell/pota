@@ -1,0 +1,122 @@
+body { 
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.title-bar {
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    background-color: #333;
+    color: white;
+    padding: 0 10px; 
+    height: 60px; 
+    border-bottom: 4px solid #4A90E2; 
+    position: relative; 
+}
+
+#parkTitleSelector {
+    background-color: #333; 
+    color: white;
+    border: none; 
+    padding: 10px 30px 10px 15px; 
+    font-size: 1.1em; 
+    font-family: 'Inter', sans-serif;
+    -webkit-appearance: none; 
+    -moz-appearance: none;    
+    appearance: none;         
+    width: 100%; 
+    text-align: center;
+    cursor: pointer;
+    border-radius: 4px; 
+}
+
+.title-bar::after {
+    content: '▼'; 
+    font-size: 0.8em;
+    color: #ccc; 
+    position: absolute;
+    right: 25px; 
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; 
+}
+
+#map { 
+    height: calc(100vh - 70px);
+    width: 100%;
+} 
+
+.map-container-wrapper { 
+    padding: 0;
+} 
+
+#loading-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    z-index: 10000; 
+    font-size: 1.2em;
+    color: #333;
+    text-align: center;
+    display: none; 
+}
+
+.leaflet-popup-content-wrapper {
+    border-radius: 5px;
+}
+
+.leaflet-popup-content {
+    font-size: 12px;
+    line-height: 1.6; 
+    max-width: 300px !important; 
+}
+
+.leaflet-popup-content a {
+    color: #0056b3;
+    text-decoration: none;
+}
+
+.leaflet-popup-content a:hover {
+    color: #007bff;
+}
+
+.leaflet-popup-content b.popup-callsign, 
+.leaflet-popup-content b.popup-parkname { 
+    color: #333;
+    font-size: 1.2em; 
+    display: block; 
+    margin-bottom: 3px;
+}
+
+.p2p-park-name {
+    font-size: 1.1em;
+    font-style: normal;
+}
+
+.popup-info-label {
+    font-weight: bold;
+    color: #555;
+}
+
+.popup-info-value {
+    color: #222;
+}
+
+.popup-detail-row {
+    margin-bottom: 3px; 
+}
+
+hr.popup-separator {
+    border: 0;
+    height: 1px;
+    background: #ccc;
+    margin: 5px 0;
+}
