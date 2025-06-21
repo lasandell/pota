@@ -41,7 +41,6 @@
             -moz-appearance: none;    
             appearance: none;         
             width: 100%; 
-            max-width: 700px; 
             text-align: center;
             cursor: pointer;
             border-radius: 4px; 
@@ -83,12 +82,23 @@
             line-height: 1.6; 
             max-width: 300px !important; 
         }
+        .leaflet-popup-content a {
+            color: #0056b3;
+            text-decoration: none; /* Remove underline from links */
+        }
+        .leaflet-popup-content a:hover {
+            color: #007bff; /* Lighter color on hover */
+        }
         .leaflet-popup-content b.popup-callsign, 
         .leaflet-popup-content b.popup-parkname { 
             color: #333;
             font-size: 1.2em; 
             display: block; 
             margin-bottom: 3px;
+        }
+        .p2p-park-name {
+            font-size: 1.1em;
+            font-style: normal;
         }
         .popup-info-label {
             font-weight: bold;
@@ -113,36 +123,29 @@
 
 <!-- Popup Templates -->
 <template id="myLocationPopupTemplate">
-    <b class="popup-parkname">{{parkName}}</b>
-    <span class="popup-info-value" style="display:block; margin-top:-2px; margin-bottom:3px;">{{callsign}}</span>
+    <b class="popup-parkname">{{{parkLink}}}</b>
+    <hr class="popup-separator">
+    <div class="popup-detail-row">
+        <span class="popup-info-label">Activated:</span> <span class="popup-info-value">{{activationDate}}</span>
+    </div>
+    <div class="popup-detail-row">
+        <span class="popup-info-label">QSOs:</span> <span class="popup-info-value">{{qsos}}</span>
+    </div>
 </template>
 
 <template id="contactPopupTemplate">
-    <b class="popup-callsign">{{callsign}}</b>
-    <hr class="popup-separator">
-    {{#details}}
-    <div class="popup-detail-row">
-        <span class="popup-info-label">{{label}}:</span> <span class="popup-info-value">{{value}}</span>
-    </div>
-    {{/details}}
-</template>
-
-<template id="p2pContactPopupTemplate">
-    <b class="popup-callsign">{{callsign}}</b>
+    <b class="popup-callsign"><a href="{{callLink}}" target="_blank">{{callsign}}</a></b>
     <hr class="popup-separator">
     {{#name}}
     <div class="popup-detail-row">
         <span class="popup-info-label">Name:</span> <span class="popup-info-value">{{name}}</span>
     </div>
     {{/name}}
+    {{#locationString}}
     <div class="popup-detail-row">
-        <span class="popup-info-label">Park:</span> <span class="popup-info-value">{{{parkLink}}}</span>
+        <span class="popup-info-label">Location:</span> <span class="popup-info-value">{{locationString}}</span>
     </div>
-    {{#type}}
-    <div class="popup-detail-row">
-        <span class="popup-info-label">Type:</span> <span class="popup-info-value">{{type}}</span>
-    </div>
-    {{/type}}
+    {{/locationString}}
     {{#distance}}
     <div class="popup-detail-row">
         <span class="popup-info-label">Distance:</span> <span class="popup-info-value">{{distance}} mi</span>
@@ -156,6 +159,27 @@
     </div>
 </template>
 
+<template id="p2pContactPopupTemplate">
+    <b class="popup-callsign"><a href="{{callLink}}" target="_blank">{{callsign}}</a></b>
+    <span class="popup-info-value p2p-park-name">{{{parkLink}}}</span>
+    <hr class="popup-separator">
+    {{#name}}
+    <div class="popup-detail-row">
+        <span class="popup-info-label">Name:</span> <span class="popup-info-value">{{name}}</span>
+    </div>
+    {{/name}}
+    {{#distance}}
+    <div class="popup-detail-row">
+        <span class="popup-info-label">Distance:</span> <span class="popup-info-value">{{distance}} mi</span>
+    </div>
+    {{/distance}}
+    <div class="popup-detail-row">
+        <span class="popup-info-label">Mode:</span> <span class="popup-info-value">{{mode}}</span>
+    </div>
+    <div class="popup-detail-row">
+        <span class="popup-info-label">Band:</span> <span class="popup-info-value">{{band}}</span>
+    </div>
+</template>
 
 <div class="title-bar">
     <select id="parkTitleSelector"></select>
@@ -168,9 +192,8 @@
 
 
 <script>
-    // Use relative path for index.json due to <base> tag
     const parkIndexUrl = 'data/index.json';
-    const MY_CALLSIGN = "KN4FVR"; // Your callsign
+    const MY_CALLSIGN = "KN4FVR";
 
     let map;
     let parkSummaryDataGlobal = []; 
@@ -178,7 +201,6 @@
     let contactLinesLayer = L.layerGroup();
     let myLocationMarker;
 
-    // --- Marker Icons ---
     const blueIcon = new L.Icon({
         iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -198,43 +220,32 @@
 
     // Function to get a corner of Maidenhead grid (e.g., South-West)
     function getGridCorner(grid) {
-        if (!grid || typeof L.Maidenhead.indexToBBox !== 'function') {
-            console.log("Maidenhead grid or L.Maidenhead.indexToBBox function is invalid for:", grid);
-            return null;
-        }
+        if (!grid || typeof L.Maidenhead.indexToBBox !== 'function') { return null; }
         try {
-            if (grid.length < 2) { 
-                console.log("Grid too short for BBox conversion:", grid);
-                return null;
-            }
+            if (grid.length < 2) { return null; }
             const bbox = L.Maidenhead.indexToBBox(grid); 
-            if (!bbox || bbox.length !== 4 || bbox.some(isNaN)) {
-                 console.log("Invalid bounding box returned for grid:", grid, bbox);
-                 return null;
-            }
+            if (!bbox || bbox.length !== 4 || bbox.some(isNaN)) { return null; }
             const cornerLat = bbox[0]; 
             const cornerLon = bbox[1];
-            if (isNaN(cornerLat) || isNaN(cornerLon)) {
-                console.log("Calculated corner is NaN for grid:", grid);
-                return null;
-            }
+            if (isNaN(cornerLat) || isNaN(cornerLon)) { return null; }
             return [cornerLat, cornerLon];
         } catch (e) {
-            console.log("Error converting grid to BBox for:", grid, e);
             return null;
         }
     }
     
-    // Helper function to create detailed popup content
     function createContactPopupContent(locationData, qsoDataForPopup) {
-        // P2P contact: use the P2P template
+        const callLink = `https://www.qrz.com/db/${locationData.callsign}`;
+        
         if (locationData.type === 'p2p_precise') {
             const template = document.getElementById('p2pContactPopupTemplate').innerHTML;
+            const parkFullName = `${qsoDataForPopup.sig_name || ''} ${qsoDataForPopup.sig_type || ''}`.trim();
+            const parkLink = `<a href="${qsoDataForPopup.sig_web || '#'}" target="_blank">${parkFullName}</a>`;
             const view = {
                 callsign: locationData.callsign,
-                name: qsoDataForPopup.name || null, // Include operator name if present
-                parkLink: `<a href="${qsoDataForPopup.sig_web || '#'}" target="_blank">${qsoDataForPopup.sig_name || ''}</a>`,
-                type: qsoDataForPopup.sig_type || null,
+                callLink: callLink,
+                name: qsoDataForPopup.name || null,
+                parkLink: parkLink,
                 distance: locationData.distance || null,
                 mode: qsoDataForPopup.mode || 'N/A',
                 band: qsoDataForPopup.band || 'N/A'
@@ -242,36 +253,32 @@
             return Mustache.render(template, view);
         }
 
-        // Regular contact: use the regular template
         const template = document.getElementById('contactPopupTemplate').innerHTML;
-        const details = [];
-        if (qsoDataForPopup.name) { details.push({ label: "Name", value: qsoDataForPopup.name }); }
-        let locationString = "";
-        if (qsoDataForPopup.city && qsoDataForPopup.state) {
-            locationString = `${qsoDataForPopup.city}, ${qsoDataForPopup.state}`;
-        } else if (qsoDataForPopup.city) {
-            locationString = qsoDataForPopup.city;
-        } else if (qsoDataForPopup.state) {
-            locationString = qsoDataForPopup.state;
-        }
-        if (locationString) { details.push({ label: "Location", value: locationString }); }
-        if (locationData.distance != null) { details.push({ label: "Distance", value: `${locationData.distance} mi` }); }
-        if (qsoDataForPopup.mode) { details.push({ label: "Mode", value: qsoDataForPopup.mode }); }
-        if (qsoDataForPopup.band) { details.push({ label: "Band", value: qsoDataForPopup.band }); }
-
         const view = {
             callsign: locationData.callsign,
-            details: details
+            callLink: callLink,
+            name: qsoDataForPopup.name || null,
+            locationString: qsoDataForPopup.city && qsoDataForPopup.state ? `${qsoDataForPopup.city}, ${qsoDataForPopup.state}` : (qsoDataForPopup.city || qsoDataForPopup.state || null),
+            distance: locationData.distance || null,
+            mode: qsoDataForPopup.mode || 'N/A',
+            band: qsoDataForPopup.band || 'N/A'
         };
         return Mustache.render(template, view);
     }
     
-    // Helper function to create popup content for "My Location"
-    function createMyPopupContent(locationData, parkName) {
+    function createMyPopupContent(parkData) {
         const template = document.getElementById('myLocationPopupTemplate').innerHTML;
+        const datePart = parkData.date || "";
+        let displayDate = "";
+        if(datePart.length === 8){
+            displayDate = `${datePart.substring(0,4)}-${datePart.substring(4,6)}-${datePart.substring(6,8)}`;
+        }
+        const fullParkName = `${parkData.name || "Unknown Park"} ${parkData.type || ''}`.trim();
+
         const view = {
-            parkName: parkName,
-            callsign: locationData.callsign
+            parkLink: `<a href="${parkData.web || '#'}" target="_blank">${fullParkName}</a>`,
+            activationDate: displayDate || 'N/A',
+            qsos: parkData.qsos || 0
         };
         return Mustache.render(template, view);
     }
@@ -299,12 +306,7 @@
             parkSummaryDataGlobal.forEach((park, index) => {
                 const option = document.createElement('option');
                 option.value = index; 
-                const datePart = park.date || "";
-                let displayDate = "";
-                if(datePart.length === 8){
-                    displayDate = `${datePart.substring(0,4)}-${datePart.substring(4,6)}-${datePart.substring(6,8)}`;
-                }
-                option.textContent = `${park.ref}: ${park.name} (${displayDate})`;
+                option.textContent = `${park.ref}: ${park.name} (${park.date.substring(0,4)}-${park.date.substring(4,6)}-${park.date.substring(6,8)})`;
                 parkSelector.appendChild(option);
             });
 
@@ -346,14 +348,12 @@
             const parkRef = parkData.ref;
             const parkDate = parkData.date; 
             const parkTime = parkData.time || "0000"; 
-            const parkName = parkData.name || "Unknown Park";
             const parkLat = parseFloat(parkData.lat);
             const parkLon = parseFloat(parkData.lon);
 
             if (isNaN(parkLat) || isNaN(parkLon)) throw new Error(`Invalid LAT/LON for park ${parkRef}`);
 
             const fullTimestampForFile = parkDate + parkTime;
-            // Use relative path for contacts file due to <base> tag
             const contactsFileUrl = `data/${fullTimestampForFile}_POTA_${parkRef}.json`;
             console.log("Fetching contacts from:", contactsFileUrl);
             
@@ -364,18 +364,13 @@
             
             loadingMessage.innerHTML = 'Data fetched. Plotting map...';
 
-            const myLocationData = {
-                callsign: MY_CALLSIGN, 
-                lat: parkLat, 
-                lon: parkLon,
-            };
             const myLatLng = L.latLng(parkLat, parkLon);
 
             myLocationMarker = L.marker(myLatLng, { 
                 icon: redIcon
-            }).addTo(map).bindPopup(createMyPopupContent(myLocationData, parkName)).openPopup();
+            }).addTo(map).bindPopup(createMyPopupContent(parkData)).openPopup();
 
-            const allCoordsForBounds = [[myLocationData.lat, myLocationData.lon]];
+            const allCoordsForBounds = [[parkLat, parkLon]];
             const contactLocationsCache = {}; 
             
             contactsData.forEach(qso => {
@@ -432,11 +427,11 @@
                 }
                 
                 const currentContactLocationData = contactLocationsCache[call];
-                if (currentContactLocationData && !currentContactLocationData.error && myLocationData &&
-                    !isNaN(myLocationData.lat) && !isNaN(myLocationData.lon) &&
+                if (currentContactLocationData && !currentContactLocationData.error && myLatLng &&
+                    !isNaN(myLatLng.lat) && !isNaN(myLatLng.lng) &&
                     !isNaN(currentContactLocationData.lat) && !isNaN(currentContactLocationData.lon)) { 
                     
-                    const lineColor = currentContactLocationData.type === 'p2p_precise' ? '#28a745' : '#FF00FF'; // Green for P2P, Magenta for regular
+                    const lineColor = '#FF00FF'; 
                     const contactLatLng = L.latLng(currentContactLocationData.lat, currentContactLocationData.lon);
                     
                     const line = L.polyline([myLatLng, contactLatLng], { 
