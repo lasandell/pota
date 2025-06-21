@@ -3,14 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radio Contacts Map - Dynamic Park Selection</title>
+    <title>KN4FVR's POTA Activations</title>
+    <!-- Base Href for relative paths -->
+    <base href="https://lasandell.github.io/pota/">
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
      crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
      crossorigin=""></script>
+    <!-- Mustache.js for templating -->
     <script src="https://unpkg.com/mustache@4.2.0/mustache.js"></script>
+    <!-- Leaflet.Maidenhead plugin for grid utilities -->
     <script src="https://unpkg.com/leaflet.maidenhead@1.1.0/src/maidenhead.js"></script>
     <style>
         body { margin: 0; font-family: 'Inter', sans-serif; background-color: #f0f0f0; color: #333; }
@@ -23,26 +28,34 @@
             padding: 0 10px; 
             height: 60px; 
             border-bottom: 4px solid #4A90E2; 
-            /* position: relative; /* No longer needed for custom arrow */
+            position: relative; 
         }
         #parkTitleSelector {
             background-color: #333; 
             color: white;
-            border: 1px solid #555; /* Subtle border for better definition */
-            padding: 10px 15px; /* Adjusted padding, browser arrow will take space */
-            font-size: 1.2em; 
+            border: none; 
+            padding: 10px 30px 10px 15px; 
+            font-size: 1.1em; 
             font-family: 'Inter', sans-serif;
-            /* Allow browser to render default appearance including arrow */
-            -webkit-appearance: auto; 
-            -moz-appearance: auto;    
-            appearance: auto;         
+            -webkit-appearance: none; 
+            -moz-appearance: none;    
+            appearance: none;         
             width: 100%; 
-            max-width: 600px; 
+            max-width: 700px; 
             text-align: center;
             cursor: pointer;
             border-radius: 4px; 
         }
-        /* Removed .title-bar::after for custom arrow */
+        .title-bar::after {
+            content: '▼'; 
+            font-size: 0.8em;
+            color: #ccc; 
+            position: absolute;
+            right: 25px; 
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none; 
+        }
 
         #map { height: calc(100vh - 70px); width: 100%; } 
         .map-container-wrapper { padding: 0; } 
@@ -98,6 +111,7 @@
 </head>
 <body>
 
+<!-- Popup Templates -->
 <template id="myLocationPopupTemplate">
     <b class="popup-parkname">{{parkName}}</b>
     <span class="popup-info-value" style="display:block; margin-top:-2px; margin-bottom:3px;">{{callsign}}</span>
@@ -113,6 +127,36 @@
     {{/details}}
 </template>
 
+<template id="p2pContactPopupTemplate">
+    <b class="popup-callsign">{{callsign}}</b>
+    <hr class="popup-separator">
+    {{#name}}
+    <div class="popup-detail-row">
+        <span class="popup-info-label">Name:</span> <span class="popup-info-value">{{name}}</span>
+    </div>
+    {{/name}}
+    <div class="popup-detail-row">
+        <span class="popup-info-label">Park:</span> <span class="popup-info-value">{{{parkLink}}}</span>
+    </div>
+    {{#type}}
+    <div class="popup-detail-row">
+        <span class="popup-info-label">Type:</span> <span class="popup-info-value">{{type}}</span>
+    </div>
+    {{/type}}
+    {{#distance}}
+    <div class="popup-detail-row">
+        <span class="popup-info-label">Distance:</span> <span class="popup-info-value">{{distance}} mi</span>
+    </div>
+    {{/distance}}
+    <div class="popup-detail-row">
+        <span class="popup-info-label">Mode:</span> <span class="popup-info-value">{{mode}}</span>
+    </div>
+    <div class="popup-detail-row">
+        <span class="popup-info-label">Band:</span> <span class="popup-info-value">{{band}}</span>
+    </div>
+</template>
+
+
 <div class="title-bar">
     <select id="parkTitleSelector"></select>
 </div>
@@ -124,7 +168,8 @@
 
 
 <script>
-    const parkIndexUrl = 'https://lasandell.github.io/pota/data/index.json';
+    // Use relative path for index.json due to <base> tag
+    const parkIndexUrl = 'data/index.json';
     const MY_CALLSIGN = "KN4FVR"; // Your callsign
 
     let map;
@@ -132,6 +177,24 @@
     let contactMarkersLayer = L.layerGroup();
     let contactLinesLayer = L.layerGroup();
     let myLocationMarker;
+
+    // --- Marker Icons ---
+    const blueIcon = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+    });
+    const redIcon = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+    });
+    const greenIcon = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+    });
+
 
     // Function to get a corner of Maidenhead grid (e.g., South-West)
     function getGridCorner(grid) {
@@ -162,38 +225,39 @@
         }
     }
     
-    // Helper function to create detailed popup content for contacted stations
+    // Helper function to create detailed popup content
     function createContactPopupContent(locationData, qsoDataForPopup) {
+        // P2P contact: use the P2P template
+        if (locationData.type === 'p2p_precise') {
+            const template = document.getElementById('p2pContactPopupTemplate').innerHTML;
+            const view = {
+                callsign: locationData.callsign,
+                name: qsoDataForPopup.name || null, // Include operator name if present
+                parkLink: `<a href="${qsoDataForPopup.sig_web || '#'}" target="_blank">${qsoDataForPopup.sig_name || ''}</a>`,
+                type: qsoDataForPopup.sig_type || null,
+                distance: locationData.distance || null,
+                mode: qsoDataForPopup.mode || 'N/A',
+                band: qsoDataForPopup.band || 'N/A'
+            };
+            return Mustache.render(template, view);
+        }
+
+        // Regular contact: use the regular template
         const template = document.getElementById('contactPopupTemplate').innerHTML;
         const details = [];
-
-        if (qsoDataForPopup.NAME) { 
-            details.push({ label: "Name", value: qsoDataForPopup.NAME });
-        }
-
+        if (qsoDataForPopup.name) { details.push({ label: "Name", value: qsoDataForPopup.name }); }
         let locationString = "";
-        if (qsoDataForPopup.QTH && qsoDataForPopup.STATE) {
-            locationString = `${qsoDataForPopup.QTH}, ${qsoDataForPopup.STATE}`;
-        } else if (qsoDataForPopup.QTH) {
-            locationString = qsoDataForPopup.QTH;
-        } else if (qsoDataForPopup.STATE) {
-            locationString = qsoDataForPopup.STATE;
+        if (qsoDataForPopup.city && qsoDataForPopup.state) {
+            locationString = `${qsoDataForPopup.city}, ${qsoDataForPopup.state}`;
+        } else if (qsoDataForPopup.city) {
+            locationString = qsoDataForPopup.city;
+        } else if (qsoDataForPopup.state) {
+            locationString = qsoDataForPopup.state;
         }
-        if (locationString) { 
-            details.push({ label: "Location", value: locationString });
-        }
-
-        if (locationData.distance != null && !isNaN(locationData.distance)) { 
-            details.push({ label: "Distance", value: `${locationData.distance} mi` });
-        }
-        
-        if (qsoDataForPopup.MODE) {
-            details.push({ label: "Mode", value: qsoDataForPopup.MODE });
-        }
-        if (qsoDataForPopup.BAND) {
-            details.push({ label: "Band", value: qsoDataForPopup.BAND });
-        }
-        // Time field removed from contact popup display
+        if (locationString) { details.push({ label: "Location", value: locationString }); }
+        if (locationData.distance != null) { details.push({ label: "Distance", value: `${locationData.distance} mi` }); }
+        if (qsoDataForPopup.mode) { details.push({ label: "Mode", value: qsoDataForPopup.mode }); }
+        if (qsoDataForPopup.band) { details.push({ label: "Band", value: qsoDataForPopup.band }); }
 
         const view = {
             callsign: locationData.callsign,
@@ -224,26 +288,23 @@
             parkSummaryDataGlobal = await response.json();
             if (!parkSummaryDataGlobal || parkSummaryDataGlobal.length === 0) throw new Error("Park summary data is empty or invalid.");
 
-            // Sort park data by DATE (YYYYMMDD) and then by TIME (HHMM), descending
             parkSummaryDataGlobal.sort((a, b) => {
-                const dateA = a.DATE || "0"; 
-                const timeA = a.TIME || "0000"; 
-                const dateB = b.DATE || "0";
-                const timeB = b.TIME || "0000";
-                
-                const dateTimeStrA = dateA + timeA; 
-                const dateTimeStrB = dateB + timeB;
-
-                if (dateTimeStrB < dateTimeStrA) return -1;
-                if (dateTimeStrB > dateTimeStrA) return 1;
+                const tsA = (a.date || "0") + (a.time || "0000"); 
+                const tsB = (b.date || "0") + (b.time || "0000");
+                if (tsB < tsA) return -1;
+                if (tsB > tsA) return 1;
                 return 0;
             });
-
 
             parkSummaryDataGlobal.forEach((park, index) => {
                 const option = document.createElement('option');
                 option.value = index; 
-                option.textContent = `${park.REF}: ${park.NAME}`;
+                const datePart = park.date || "";
+                let displayDate = "";
+                if(datePart.length === 8){
+                    displayDate = `${datePart.substring(0,4)}-${datePart.substring(4,6)}-${datePart.substring(6,8)}`;
+                }
+                option.textContent = `${park.ref}: ${park.name} (${displayDate})`;
                 parkSelector.appendChild(option);
             });
 
@@ -272,7 +333,7 @@
         const loadingMessage = document.getElementById('loading-message');
         let contactsData;
 
-        loadingMessage.innerHTML = `Fetching contacts for ${parkData.REF}...`;
+        loadingMessage.innerHTML = `Fetching contacts for ${parkData.ref}...`;
         loadingMessage.style.display = 'block';
 
         contactMarkersLayer.clearLayers();
@@ -282,17 +343,18 @@
         }
 
         try {
-            const parkRef = parkData.REF;
-            const parkDate = parkData.DATE; 
-            const parkTime = parkData.TIME || "0000"; 
-            const parkName = parkData.NAME || "Unknown Park";
-            const parkLat = parseFloat(parkData.LAT);
-            const parkLon = parseFloat(parkData.LON);
+            const parkRef = parkData.ref;
+            const parkDate = parkData.date; 
+            const parkTime = parkData.time || "0000"; 
+            const parkName = parkData.name || "Unknown Park";
+            const parkLat = parseFloat(parkData.lat);
+            const parkLon = parseFloat(parkData.lon);
 
             if (isNaN(parkLat) || isNaN(parkLon)) throw new Error(`Invalid LAT/LON for park ${parkRef}`);
 
             const fullTimestampForFile = parkDate + parkTime;
-            const contactsFileUrl = `https://lasandell.github.io/pota/data/${fullTimestampForFile}_POTA_${parkRef}.json`;
+            // Use relative path for contacts file due to <base> tag
+            const contactsFileUrl = `data/${fullTimestampForFile}_POTA_${parkRef}.json`;
             console.log("Fetching contacts from:", contactsFileUrl);
             
             const response = await fetch(contactsFileUrl);
@@ -310,38 +372,43 @@
             const myLatLng = L.latLng(parkLat, parkLon);
 
             myLocationMarker = L.marker(myLatLng, { 
-                icon: L.icon({
-                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                    iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
-                })
+                icon: redIcon
             }).addTo(map).bindPopup(createMyPopupContent(myLocationData, parkName)).openPopup();
 
             const allCoordsForBounds = [[myLocationData.lat, myLocationData.lon]];
             const contactLocationsCache = {}; 
             
             contactsData.forEach(qso => {
-                const call = qso.CALL;
+                const call = qso.call;
                 let contactData = contactLocationsCache[call]; 
 
                 if (!contactData) { 
-                    const contactGrid = qso.GRIDSQUARE;
-                    const contactState = qso.STATE; 
                     let contactCoords; 
 
-                    if (contactGrid) {
-                        contactCoords = getGridCorner(contactGrid); 
+                    if (qso.sig_ref && qso.sig_lat && qso.sig_lon) {
+                        const sigLat = parseFloat(qso.sig_lat);
+                        const sigLon = parseFloat(qso.sig_lon);
+                        if (!isNaN(sigLat) && !isNaN(sigLon)) {
+                            contactData = {
+                                callsign: call, lat: sigLat, lon: sigLon,
+                                type: 'p2p_precise', state: qso.state || null
+                            };
+                        }
+                    } 
+                    
+                    if (!contactData && qso.grid) {
+                        contactCoords = getGridCorner(qso.grid); 
                         if (contactCoords) {
                             contactData = {
                                 callsign: call, lat: contactCoords[0], lon: contactCoords[1],
-                                gridsquare: contactGrid, state: contactState || null 
+                                type: 'grid_corner', state: qso.state || null 
                             };
-                        } else {
-                             contactData = { callsign: call, error: true, message: `Invalid grid or BBox for ${contactGrid}.` };
                         }
-                    } else {
-                        console.log(`Contact ${call} missing GRIDSQUARE. Cannot plot.`); 
-                        contactData = { callsign: call, error: true, message: `Missing GRIDSQUARE for ${call}.` };
+                    } 
+                    
+                    if (!contactData) {
+                        console.log(`Contact ${call} has no valid location (P2P lat/lon or grid). Cannot plot.`); 
+                        contactData = { callsign: call, error: true, message: `No location for ${call}.` };
                     }
                     
                     if (!contactData.error && myLatLng && !isNaN(contactData.lat) && !isNaN(contactData.lon)) {
@@ -352,17 +419,15 @@
                         contactLocationsCache[call] = contactData; 
                         allCoordsForBounds.push([contactData.lat, contactData.lon]);
                         
+                        const markerIcon = contactData.type === 'p2p_precise' ? greenIcon : blueIcon;
+                        
                         const marker = L.marker([contactData.lat, contactData.lon], { 
-                            icon: L.icon({
-                                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-                                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
-                            })
+                            icon: markerIcon
                         }).bindPopup(createContactPopupContent(contactData, qso));
                         contactMarkersLayer.addLayer(marker);
 
-                    } else if (contactData.error || (contactData && (isNaN(contactData.lat) || isNaN(contactData.lon)))) {
-                         console.log(`Skipping marker for ${call}: ${contactData.message || 'Invalid coordinates (NaN)'}`); 
+                    } else if (contactData.error) {
+                         console.log(`Skipping marker for ${call}: ${contactData.message}`); 
                     }
                 }
                 
@@ -371,7 +436,7 @@
                     !isNaN(myLocationData.lat) && !isNaN(myLocationData.lon) &&
                     !isNaN(currentContactLocationData.lat) && !isNaN(currentContactLocationData.lon)) { 
                     
-                    const lineColor = '#FF00FF'; 
+                    const lineColor = currentContactLocationData.type === 'p2p_precise' ? '#28a745' : '#FF00FF'; // Green for P2P, Magenta for regular
                     const contactLatLng = L.latLng(currentContactLocationData.lat, currentContactLocationData.lon);
                     
                     const line = L.polyline([myLatLng, contactLatLng], { 
