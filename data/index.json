@@ -193,5 +193,18 @@
     "lon": "-86.1032",
     "qsos": 10,
     "web": "https://tnstateparks.com/parks/old-stone-fort"
+  },
+  {
+    "date": "20250630",
+    "time": "1350",
+    "sig": "POTA",
+    "ref": "US-1402",
+    "name": "Presque Isle",
+    "type": "State Park",
+    "grid": "EN92WC",
+    "lat": "42.1163",
+    "lon": "-80.1518",
+    "qsos": 12,
+    "web": "https://www.dcnr.pa.gov/StateParks/FindAPark/PresqueIsleStatePark/Pages/default.aspx"
   }
 ]
