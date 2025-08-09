@@ -236,10 +236,10 @@ async function loadMapForSelectedPark(parkData) {
                 !isNaN(myLatLng.lat) && !isNaN(myLatLng.lng) &&
                 !isNaN(currentContactLocationData.lat) && !isNaN(currentContactLocationData.lon)) { 
                 
-                const lineColor = '#FF00FF'; 
+                const lineColor = 'teal'; 
                 const contactLatLng = L.latLng(currentContactLocationData.lat, currentContactLocationData.lon);
                 
-                const line = L.polyline([myLatLng, contactLatLng], { 
+                const line = L.smoothGeodesic(myLatLng, contactLatLng, 65, { 
                     color: lineColor, 
                     weight: 2.5, 
                     opacity: 0.75 
