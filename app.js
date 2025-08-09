@@ -1,5 +1,6 @@
 const parkIndexUrl = 'data/index.json';
 const MY_CALLSIGN = "KN4FVR";
+const DEFAULT_PARK = "US-2956";
 
 let map;
 let parkSummaryDataGlobal = []; 
@@ -123,7 +124,16 @@ async function initializeParkSelector() {
         });
 
         if (parkSummaryDataGlobal.length > 0) {
-            loadMapForSelectedPark(parkSummaryDataGlobal[0]); 
+            // Look for default park if specified
+            let selectedIndex = 0;
+            if (DEFAULT_PARK) {
+                const defaultParkIndex = parkSummaryDataGlobal.findIndex(park => park.ref === DEFAULT_PARK);
+                if (defaultParkIndex !== -1) {
+                    selectedIndex = defaultParkIndex;
+                    parkSelector.value = defaultParkIndex;
+                }
+            }
+            loadMapForSelectedPark(parkSummaryDataGlobal[selectedIndex]); 
         } else {
                 loadingMessage.textContent = 'No parks found in index.';
                 loadingMessage.style.display = 'block'; 
