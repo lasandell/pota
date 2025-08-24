@@ -232,5 +232,18 @@
     "lon": "-85.6223",
     "qsos": 13,
     "web": "https://www.tn.gov/environment/program-areas/na-natural-areas/natural-areas-middle-region/middle-region/na-na-window-cliffs.html"
+  },
+  {
+    "date": "20250823",
+    "time": "2140",
+    "sig": "POTA",
+    "ref": "US-2934",
+    "name": "Burgess Falls",
+    "type": "State Park",
+    "grid": "EM76EB",
+    "lat": "36.0441",
+    "lon": "-85.5947",
+    "qsos": 20,
+    "web": "https://tnstateparks.com/parks/burgess-falls"
   }
 ]
