@@ -1,6 +1,6 @@
 const parkIndexUrl = 'data/index.json';
 const MY_CALLSIGN = "KN4FVR";
-const DEFAULT_PARK = "US-2956";
+const DEFAULT_PARK = "";
 
 let map;
 let parkSummaryDataGlobal = []; 
