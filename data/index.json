@@ -208,6 +208,19 @@
     "web": "https://www.dcnr.pa.gov/StateParks/FindAPark/PresqueIsleStatePark/Pages/default.aspx"
   },
   {
+  "date": "20250823",
+  "time": "1549",
+  "sig": "POTA",
+  "ref": "US-2944",
+  "name": "Edgar Evins",
+  "type": "State Park",
+  "grid": "EM76CB",
+  "lat": "36.0807",
+  "lon": "-85.8165",
+  "qsos": 18,
+  "web": "https://tnstateparks.com/parks/edgar-evins"
+  },
+  {
     "date": "20250823",
     "time": "1947",
     "sig": "POTA",
