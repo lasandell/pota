@@ -206,5 +206,18 @@
     "lon": "-80.1518",
     "qsos": 12,
     "web": "https://www.dcnr.pa.gov/StateParks/FindAPark/PresqueIsleStatePark/Pages/default.aspx"
+  },
+  {
+    "date": "20250823",
+    "time": "1947",
+    "sig": "POTA",
+    "ref": "US-6280",
+    "name": "Window Cliffs",
+    "type": "State Natural Area",
+    "grid": "EM76EB",
+    "lat": "36.0534",
+    "lon": "-85.6223",
+    "qsos": 13,
+    "web": "https://www.tn.gov/environment/program-areas/na-natural-areas/natural-areas-middle-region/middle-region/na-na-window-cliffs.html"
   }
 ]
